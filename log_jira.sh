@@ -43,6 +43,8 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 
+
+
 # check mandatory arguments
 if [[ -z "$TICKET" || -z "$TIME_SPENT" || -z "$LOG_TIME" ]]; then
   echo "❌ Missing mandatory arguments argument! Usage:"
@@ -50,6 +52,10 @@ if [[ -z "$TICKET" || -z "$TIME_SPENT" || -z "$LOG_TIME" ]]; then
   exit 1
 fi
 
+# Porovnání dat
+if [[ "$DAY_TO" < "$DAY_FROM" ]]; then
+  DAY_TO=$DAY_FROM
+fi
 
 # 📅 convert time to Jira format
 LOG_TIME_ISO="${LOG_TIME}:00.000+0100"
@@ -70,6 +76,8 @@ else
     CURRENT_DATE=$(date -j -v+1d -f "%Y-%m-%d" "$CURRENT_DATE" "+%Y-%m-%d")
   done
 fi
+
+
 
 # 📌 Počet úspěšně zalogovaných dní
 LOGGED_COUNT=0

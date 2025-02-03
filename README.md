@@ -68,7 +68,7 @@ Logs **0.25h at 09:45 AM** for **February 6, 2025**.
 
 ### Log work with custom time and duration
 ```bash
-./log_jira.sh --ticket FWBA-11 --day-from 2025-01-05 --time-spent 15m --log-time=10:30
+./log_jira.sh --ticket FWBA-11 --day-from 2025-02-06 --time-spent 15m --log-time=10:30
 ```
 Logs **0.5h at 10:30 AM** for **February 6, 2025**.
 
