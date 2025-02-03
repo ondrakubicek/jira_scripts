@@ -14,7 +14,7 @@ TICKET_DEFAULT="CEREMONY-11"
 - generate token
 
 ## How to 
-run `./log_jira.sh --ticket FWBA-11 --time-spent 15m --log-time=9:45 --day-to 2025-01-15 --day-from 2025-01-03` 
+run `./log_jira.sh --ticket FWBA-11 --time-spent=15m --log-time=9:45 --day-to 2025-01-15 --day-from 2025-01-03` 
 
 
 # JIRA Log Automation Script
@@ -68,13 +68,13 @@ Logs **0.25h at 09:45 AM** for **February 6, 2025**.
 
 ### Log work with custom time and duration
 ```bash
-./log_jira.sh --ticket FWBA-11 --day-from 2025-02-06 --time-spent 15m --log-time=10:30
+./log_jira.sh --ticket FWBA-11 --day-from 2025-02-06 --time-spent=15m --log-time=10:30
 ```
 Logs **0.5h at 10:30 AM** for **February 6, 2025**.
 
 ### Log work for a date range
 ```bash
-./log_jira.sh --ticket FWBA-11 --time-spent 15m --log-time=9:45 --day-from 2025-01-05 --day-to 2025-01-10
+./log_jira.sh --ticket FWBA-11 --time-spent=15m --log-time=9:45 --day-from 2025-01-05 --day-to 2025-01-10
 ```
 Logs **0.25h at 09:45 AM** for **all weekdays between January 5-10, 2025**.
 
@@ -91,4 +91,5 @@ Logs **0.25h at 09:45 AM** for **all weekdays between January 5-10, 2025**.
 - Ensure `.env` is correctly set up and contains valid credentials.
 - Check execution permissions: `chmod +x log_jira.sh`
 - Run manually and check output/logs.
+
 

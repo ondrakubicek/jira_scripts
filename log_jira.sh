@@ -9,10 +9,9 @@ if [[ -z "$JIRA_EMAIL" || -z "$JIRA_TOKEN" || -z "$JIRA_DOMAIN" ]]; then
   exit 1
 fi
 
-
-# Default values  (if day is not specified, use today's date)
+# Default values (DAY_FROM is configurable, DAY_TO is optional)
 DAY_FROM=$(date "+%Y-%m-%d")
-DAY_TO=$DAY_FROM
+DAY_TO=""
 TIME_SPENT="0.25h"              # Defaultně 15 minut (0.25h)
 LOG_TIME="09:45"                # Defaultně v 9:45 ráno
 TICKET=$TICKET_DEFAULT
@@ -43,28 +42,18 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 
-
-
-# check mandatory arguments
-if [[ -z "$TICKET" || -z "$TIME_SPENT" || -z "$LOG_TIME" ]]; then
-  echo "❌ Missing mandatory arguments argument! Usage:"
-  echo "  $0 --ticket=TICKET --day-from=YYYY-MM-DD --day-to=YYYY-MM-DD --time-spent=H:M --log-time=H:M"
-  exit 1
+# 🛠 Ensure DAY_TO is valid
+if [[ -n "$DAY_TO" && "$DAY_TO" < "$DAY_FROM" ]]; then
+  echo "⚠️ DAY_TO ($DAY_TO) is earlier than DAY_FROM ($DAY_FROM). Setting DAY_TO = DAY_FROM."
+  DAY_TO="$DAY_FROM"
 fi
 
-# Porovnání dat
-if [[ "$DAY_TO" < "$DAY_FROM" ]]; then
-  DAY_TO=$DAY_FROM
-fi
-
-# 📅 convert time to Jira format
+# 📅 Convert time to Jira format
 LOG_TIME_ISO="${LOG_TIME}:00.000+0100"
 
 # 🔄 Generating date range (if DAY_TO is specified)
-DATES=()
-if [[ -z "$DAY_TO" ]]; then
-  DATES=("$DAY_FROM")
-else
+DATES=("$DAY_FROM")
+if [[ -n "$DAY_TO" && "$DAY_TO" != "$DAY_FROM" ]]; then
   CURRENT_DATE="$DAY_FROM"
   while [[ "$CURRENT_DATE" != "$(date -j -v+1d -f "%Y-%m-%d" "$DAY_TO" "+%Y-%m-%d")" ]]; do
     # ❌ Skip weekends (sat: 6, sun: 7)
@@ -77,14 +66,11 @@ else
   done
 fi
 
-
-
 # 📌 Počet úspěšně zalogovaných dní
 LOGGED_COUNT=0
 
-# 🔄 Send logu for each day DATES
+# 🔄 Send log for each day in DATES
 for DAY in "${DATES[@]}"; do
-  # 📅 Convert to ISO
   LOG_DATE_ISO="${DAY}T${LOG_TIME_ISO}"
 
   # 📡 Send to Jira api
@@ -97,7 +83,6 @@ for DAY in "${DATES[@]}"; do
       }' \
       "https://$JIRA_DOMAIN/rest/api/3/issue/$TICKET/worklog")
 
-
   # ✅ Response control
   if [[ "$RESPONSE" == "201" ]]; then
     LOGGED_COUNT=$((LOGGED_COUNT + 1))
@@ -107,7 +92,7 @@ for DAY in "${DATES[@]}"; do
   fi
 done
 
-# 🖥  MacOS notification
+# 🖥 MacOS notification
 if [[ "$LOGGED_COUNT" -gt 0 ]]; then
   if [[ "${#DATES[@]}" -eq 1 ]]; then
     osascript -e "display notification \"✅ Logged $TIME_SPENT on $TICKET\" sound name \"Submarine\""
